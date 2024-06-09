@@ -18,6 +18,5 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Discount>().HasKey(d => d.IdDiscount);
         modelBuilder.Entity<Payment>().HasKey(p => p.IdPayment);
 
-        // Additional configurations if needed
     }
 }
