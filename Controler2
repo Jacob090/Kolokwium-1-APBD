@@ -1,0 +1,63 @@
+[ApiController]
+[Route("api/[controller]")]
+public class PaymentController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public PaymentController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddPayment(int idClient, int idSubscription, DateTime date, decimal amount)
+    {
+        var client = await _context.Clients.FindAsync(idClient);
+        if (client == null)
+        {
+            return NotFound("Client not found");
+        }
+
+        var subscription = await _context.Subscriptions.FindAsync(idSubscription);
+        if (subscription == null)
+        {
+            return NotFound("Subscription not found");
+        }
+
+        var sale = await _context.Sales
+            .Where(s => s.IdClient == idClient && s.IdSubscription == idSubscription)
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (sale == null || sale.Subscription.EndTime < DateTime.Now)
+        {
+            return BadRequest("Subscription is not active");
+        }
+
+        var existingPayments = await _context.Payments
+            .Where(p => p.IdClient == idClient && p.IdSubscription == idSubscription && p.Date.Month == date.Month && p.Date.Year == date.Year)
+            .ToListAsync();
+
+        if (existingPayments.Any())
+        {
+            return BadRequest("Payment for this period already exists");
+        }
+
+        var discount = client.Discounts.FirstOrDefault(d => d.DateFrom <= DateTime.Now && d.DateTo >= DateTime.Now);
+        var discountValue = discount?.Value ?? 0;
+        var discountedAmount = amount - (amount * discountValue / 100);
+
+        var payment = new Payment
+        {
+            IdClient = idClient,
+            IdSubscription = idSubscription,
+            Date = date,
+            Amount = discountedAmount
+        };
+
+        _context.Payments.Add(payment);
+        await _context.SaveChangesAsync();
+
+        return Ok(payment);
+    }
+}
