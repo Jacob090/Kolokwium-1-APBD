@@ -1,0 +1,49 @@
+public class Client
+{
+    public int IdClient { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+    public string Phone { get; set; }
+    public ICollection<Sale> Sales { get; set; }
+    public ICollection<Discount> Discounts { get; set; }
+}
+
+public class Subscription
+{
+    public int IdSubscription { get; set; }
+    public string Name { get; set; }
+    public int RenewalPeriod { get; set; }
+    public DateTime EndTime { get; set; }
+    public decimal Price { get; set; }
+}
+
+public class Sale
+{
+    public int IdSale { get; set; }
+    public int IdClient { get; set; }
+    public int IdSubscription { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public Client Client { get; set; }
+    public Subscription Subscription { get; set; }
+}
+
+public class Discount
+{
+    public int IdDiscount { get; set; }
+    public int Value { get; set; }
+    public DateTime DateFrom { get; set; }
+    public DateTime DateTo { get; set; }
+    public int IdClient { get; set; }
+    public Client Client { get; set; }
+}
+
+public class Payment
+{
+    public int IdPayment { get; set; }
+    public DateTime Date { get; set; }
+    public int IdClient { get; set; }
+    public int IdSubscription { get; set; }
+    public Client Client { get; set; }
+    public Subscription Subscription { get; set; }
+}
