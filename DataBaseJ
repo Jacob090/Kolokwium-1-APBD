@@ -1,0 +1,23 @@
+public class AppDbContext : DbContext
+{
+    public DbSet<Client> Clients { get; set; }
+    public DbSet<Subscription> Subscriptions { get; set; }
+    public DbSet<Sale> Sales { get; set; }
+    public DbSet<Discount> Discounts { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Client>().HasKey(c => c.IdClient);
+        modelBuilder.Entity<Subscription>().HasKey(s => s.IdSubscription);
+        modelBuilder.Entity<Sale>().HasKey(s => s.IdSale);
+        modelBuilder.Entity<Discount>().HasKey(d => d.IdDiscount);
+        modelBuilder.Entity<Payment>().HasKey(p => p.IdPayment);
+
+        // Additional configurations if needed
+    }
+}
